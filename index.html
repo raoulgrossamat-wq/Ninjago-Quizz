@@ -1,1 +1,1153 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEGO Ninjago - Morning Brief Quiz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Teko (Action/Ninja) & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
 
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #111; /* Dark Ninja Black */
+      /* Background pattern */
+      background-image: 
+        radial-gradient(ellipse at 50% 0%, rgba(220, 38, 38, 0.15), transparent 70%),
+        radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 20px 20px;
+    }
+
+    .font-ninja {
+      font-family: 'Teko', sans-serif;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Teams Colors */
+    .bg-spinjitzu { background-color: #dc2626; } /* Red (Kai) */
+    .text-spinjitzu { color: #f87171; }
+    .bg-garmadon { background-color: #4c1d95; } /* Purple (Garmadon) */
+    .text-garmadon { color: #a78bfa; }
+
+    @keyframes pulseTimer {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .animate-danger-pulse {
+      animation: pulseTimer 0.6s infinite ease-in-out;
+    }
+    
+    /* Boutons de réponses */
+    .option-btn {
+      transition: all 0.2s ease;
+    }
+    .option-btn:active {
+      transform: scale(0.98) skewX(-2deg);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-red-600 selection:text-white">
+
+  <!-- HEADER -->
+  <header class="w-full border-b border-red-600/30 bg-black/90 backdrop-blur-md sticky top-0 z-50 px-4 py-3 shadow-lg shadow-red-900/20">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="app.showScreen('welcome')">
+        <!-- LEGO Brick Icon (Red) -->
+        <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center font-black text-white shadow-md border-2 border-red-400">
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+            <path d="M19 6V5a2 2 0 0 0-2-2 2 2 0 0 0-2 2v1H9V5a2 2 0 0 0-2-2 2 2 0 0 0-2 2v1H3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-3zM7 5a1 1 0 0 1 2 0v1H7V5zm8 0a1 1 0 0 1 2 0v1h-2V5z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-red-500 block">LEGO Store Brief</span>
+          <h1 class="text-2xl md:text-3xl font-ninja font-bold tracking-tight text-white flex items-center gap-2 leading-none mt-1">
+            NINJAGO <span class="bg-red-600 text-white px-1.5 py-0.5 rounded-sm text-sm md:text-base leading-none font-sans font-black tracking-normal">QUIZ</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Header actions -->
+      <div class="flex items-center gap-2">
+        <button onclick="app.showLeaderboard()" class="px-3 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-xs md:text-sm font-semibold border border-gray-700 transition flex items-center gap-1.5 text-gray-200">
+          🏆 <span class="hidden sm:inline">Palmarès des Maîtres</span>
+        </button>
+        <button id="soundToggleBtn" onclick="app.toggleSound()" class="p-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-red-500 border border-gray-700 transition" title="Activer / Couper les sons du Dojo">
+          <svg id="soundIconOn" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          </svg>
+          <svg id="soundIconOff" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z m12.414-4.586L21 7.414M18 10.414l3 3"/>
+          </svg>
+        </button>
+        <button onclick="app.openCustomModal()" class="px-3 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 text-xs md:text-sm font-semibold border border-gray-700 transition flex items-center gap-1.5 text-gray-200">
+          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span class="hidden sm:inline">Nouveaux</span> Parchemins
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow flex items-center justify-center p-4 max-w-4xl w-full mx-auto relative z-10">
+
+    <!-- SCREEN 1: ACCUEIL & CHOIX DU MODE -->
+    <section id="screen-welcome" class="w-full text-center space-y-8 py-6">
+      <div class="space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/10 border border-red-600/30 text-red-500 text-xs uppercase tracking-wider font-bold">
+          🐉 NINJA GO !
+        </div>
+        <h2 class="text-5xl md:text-7xl font-ninja text-transparent bg-clip-text bg-gradient-to-br from-red-400 via-red-600 to-yellow-500 drop-shadow-lg">
+          LE MONASTÈRE DU SPINJITZU
+        </h2>
+        <p class="text-gray-400 max-w-lg mx-auto text-sm md:text-base">
+          Prouvez votre valeur et votre connaissance des sets et de la série Ninjago avant d'affronter l'ouverture du magasin !
+        </p>
+      </div>
+
+      <!-- Sélection du mode -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-left max-w-2xl mx-auto">
+        <!-- Mode Solo / Flash -->
+        <div onclick="app.openNameSetup('solo')" class="group relative bg-gray-900/80 hover:bg-gray-800/90 border border-gray-700 hover:border-red-500 p-6 rounded-2xl cursor-pointer transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-red-600/20">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-red-600/20 text-red-500 flex items-center justify-center font-bold text-xl border border-red-500/30">
+              🗡️
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-red-600/10 text-red-400 border border-red-600/20 font-semibold">Voie du Ninja</span>
+          </div>
+          <h3 class="text-2xl font-ninja text-white group-hover:text-red-400 transition mb-1">Entraînement Solo / Collectif</h3>
+          <p class="text-sm text-gray-400">Idéal projeté sur grand écran : répondez tous ensemble ou désignez l'élu du matin.</p>
+        </div>
+
+        <!-- Mode Duel Équipes -->
+        <div onclick="app.openNameSetup('duel')" class="group relative bg-gray-900/80 hover:bg-gray-800/90 border border-gray-700 hover:border-purple-500 p-6 rounded-2xl cursor-pointer transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-purple-600/20">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-gray-800 text-white flex items-center justify-center font-bold text-xl border border-gray-600">
+              ⚡
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-300 border border-gray-600 font-semibold">Combat d'Éléments</span>
+          </div>
+          <h3 class="text-2xl font-ninja text-white group-hover:text-purple-400 transition mb-1">Tournoi des Éléments</h3>
+          <p class="text-sm text-gray-400">Affrontement tour par tour ! Ninjas contre Serpentine, ou équipe contre équipe.</p>
+        </div>
+      </div>
+
+      <!-- Quick Settings -->
+      <div class="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400 pt-4">
+        <label class="flex items-center gap-2 cursor-pointer bg-gray-900/90 px-4 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition">
+          <input type="checkbox" id="timerEnabledCheck" checked class="w-4 h-4 text-red-600 accent-red-600 rounded">
+          <span>Chronomètre de 15 secondes</span>
+        </label>
+        <span class="text-gray-600">•</span>
+        <div class="text-xs text-gray-500">
+          Parchemins : <span id="poolCountText" class="text-red-500 font-bold">100</span> secrets
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: QUESTION EN COURS -->
+    <section id="screen-quiz" class="w-full hidden space-y-6">
+
+      <!-- Barre d'état (Scores, Tour, Minuteur) -->
+      <div class="bg-gray-900/90 backdrop-blur-md rounded-2xl p-4 border border-gray-700 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+        <!-- Info progression -->
+        <div class="flex items-center gap-3">
+          <span class="text-sm px-2.5 py-1 rounded bg-black text-red-500 border border-red-600/30 font-ninja" id="currentRoundBadge">
+            Q1 / 10
+          </span>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-md" id="categoryBadge">
+            Univers Ninjago
+          </span>
+        </div>
+
+        <!-- Mode Duel Status -->
+        <div id="duelHeaderWidget" class="hidden flex items-center gap-4 text-xs font-bold">
+          <div id="teamAStatus" class="px-3 py-1.5 rounded-lg border transition">
+            <span class="text-red-500 font-ninja text-lg" id="uiTeamAName">NINJAS</span> : <span id="teamAScore" class="text-white text-sm">0</span>
+          </div>
+          <span class="text-gray-500 font-ninja text-xl">VS</span>
+          <div id="teamBStatus" class="px-3 py-1.5 rounded-lg border transition">
+            <span class="text-purple-500 font-ninja text-lg" id="uiTeamBName">ENNEMIS</span> : <span id="teamBScore" class="text-white text-sm">0</span>
+          </div>
+        </div>
+
+        <!-- Solo Score -->
+        <div id="soloHeaderWidget" class="text-sm font-semibold text-gray-300">
+          <span id="uiSoloName" class="font-ninja text-lg tracking-wide">Points</span> : <span id="soloScore" class="text-red-500 font-ninja text-2xl">0</span> pts
+        </div>
+
+        <!-- Timer Circle -->
+        <div id="timerContainer" class="flex items-center gap-2 font-ninja">
+          <div id="timerBox" class="w-11 h-11 rounded-full bg-black border-2 border-red-600 flex items-center justify-center text-red-500 text-xl transition-colors shadow-[0_0_10px_rgba(220,38,38,0.3)]">
+            15
+          </div>
+        </div>
+      </div>
+
+      <!-- Turn Indicator for Duel Mode -->
+      <div id="teamTurnIndicator" class="hidden text-center py-1">
+        <p class="text-2xl font-ninja text-gray-200" id="teamTurnText">
+          C'est au tour des <span class="text-red-500">NINJAS</span> !
+        </p>
+      </div>
+
+      <!-- Question Card -->
+      <div class="bg-gradient-to-b from-gray-800 to-gray-900 border border-gray-700 rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-2xl">
+        <!-- Bandeau décoratif -->
+        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-800 via-red-500 to-yellow-500"></div>
+
+        <div class="min-h-[100px] flex items-center justify-center text-center mt-2">
+          <h3 id="questionText" class="text-xl md:text-2xl font-bold text-white leading-snug">
+            Chargement du parchemin...
+          </h3>
+        </div>
+
+        <!-- Options Container -->
+        <div id="optionsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-8">
+          <!-- Injecté dynamiquement -->
+        </div>
+
+        <!-- Feedback & Explication -->
+        <div id="feedbackContainer" class="hidden mt-6 p-4 rounded-xl border transition-all text-center space-y-2">
+          <div id="feedbackTitle" class="font-ninja text-2xl tracking-wide uppercase"></div>
+          <p id="feedbackExplanation" class="text-sm text-gray-300"></p>
+          <button id="nextBtn" onclick="app.nextQuestion()" class="mt-4 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white font-ninja text-xl tracking-wider rounded-xl transition shadow-lg inline-flex items-center gap-2">
+            <span>QUESTION SUIVANTE</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: RÉSULTATS / BILAN DU BRIEF -->
+    <section id="screen-results" class="w-full hidden text-center space-y-8 py-6">
+      <div class="space-y-3">
+        <div class="inline-block p-4 rounded-full bg-red-600/10 border border-red-600/30 text-5xl mb-2" id="resultTrophyIcon">
+          🐉
+        </div>
+        <h2 id="resultMainTitle" class="text-5xl md:text-6xl font-ninja text-white drop-shadow-md">
+          FIN DE L'ENTRAÎNEMENT !
+        </h2>
+        <p id="resultSubtitle" class="text-gray-400 max-w-md mx-auto text-sm md:text-base">
+          Maître Wu a évalué vos compétences. Voici le bilan.
+        </p>
+      </div>
+
+      <!-- Bilan Card -->
+      <div class="bg-gray-900 border border-gray-700 rounded-3xl p-6 md:p-8 max-w-xl mx-auto shadow-2xl space-y-6 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-red-600/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-600/10 rounded-full blur-3xl"></div>
+
+        <div id="soloScoreDisplay" class="space-y-2 relative z-10">
+          <p class="text-xl text-gray-400 font-ninja">Score Obtenu</p>
+          <div class="text-6xl font-ninja text-red-500 drop-shadow-md" id="finalScoreVal">8 / 10</div>
+          <div class="text-sm font-semibold text-white pt-2 bg-black/50 inline-block px-4 py-1.5 rounded-full border border-gray-600" id="rankTitleBadge">Rang : Maître du Spinjitzu</div>
+        </div>
+
+        <div id="duelScoreDisplay" class="hidden space-y-5 relative z-10">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-5 rounded-2xl bg-red-950/40 border border-red-500/40 shadow-inner">
+              <span id="finalUiTeamAName" class="text-xl font-ninja text-red-500 block mb-1">MAÎTRES</span>
+              <span id="finalTeamAScore" class="text-5xl font-ninja text-white">0</span>
+            </div>
+            <div class="p-5 rounded-2xl bg-purple-950/40 border border-purple-500/40 shadow-inner">
+              <span id="finalUiTeamBName" class="text-xl font-ninja text-purple-500 block mb-1">GARMADON</span>
+              <span id="finalTeamBScore" class="text-5xl font-ninja text-white">0</span>
+            </div>
+          </div>
+          <div id="duelWinnerText" class="text-2xl font-ninja text-white tracking-wide uppercase bg-black/50 py-2 rounded-lg border border-gray-700">
+            Les Maîtres du Spinjitzu l'emportent !
+          </div>
+        </div>
+
+        <!-- Conseil / Punchline LEGO pour la journée -->
+        <div class="p-4 rounded-xl bg-black/60 border border-gray-700 text-left flex gap-3 items-center relative z-10">
+          <span class="text-2xl">🔥</span>
+          <div class="text-xs md:text-sm text-gray-300">
+            <strong class="text-white block font-ninja text-xl tracking-wide">LA SAGESSE DU JOUR :</strong>
+            <span id="dailyMotto">Le Ninja ne se rend jamais ! Foncez sur vos objectifs de la journée.</span>
+          </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center pt-4 relative z-10">
+          <button onclick="app.showScreen('welcome')" class="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-ninja text-xl transition shadow-lg">
+            RETOUR AU DOJO
+          </button>
+          <button onclick="app.restartWithSameSettings()" class="px-6 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-ninja text-xl border border-gray-600 transition">
+            REJOUER
+          </button>
+          <button onclick="app.showLeaderboard()" class="px-6 py-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-yellow-500 font-ninja text-xl border border-yellow-600/30 transition">
+            PALMARÈS
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: CLASSEMENT -->
+    <section id="screen-leaderboard" class="w-full hidden text-center space-y-8 py-6 relative z-10">
+      <div class="space-y-3">
+        <h2 class="text-5xl md:text-6xl font-ninja text-white drop-shadow-md">
+          PALMARÈS DES MAÎTRES
+        </h2>
+        <p class="text-gray-400 max-w-md mx-auto text-sm md:text-base">
+          Les meilleurs guerriers de l'histoire du magasin.
+        </p>
+      </div>
+
+      <div class="bg-gray-900 border border-gray-700 rounded-3xl p-6 md:p-8 max-w-2xl mx-auto shadow-2xl">
+        <!-- Onglets -->
+        <div class="flex gap-4 border-b border-gray-700 mb-6 pb-2 justify-center font-ninja text-2xl">
+          <button onclick="app.renderLeaderboardList('solo')" id="tabSolo" class="text-red-500 border-b-2 border-red-500 px-4 py-1">VOIE DU NINJA</button>
+          <button onclick="app.renderLeaderboardList('duel')" id="tabDuel" class="text-gray-500 hover:text-gray-300 px-4 py-1 transition">TOURNOI (DUEL)</button>
+        </div>
+
+        <div id="leaderboardList" class="space-y-3 text-left">
+          <!-- Injecté dynamiquement -->
+        </div>
+        
+        <div class="mt-8 flex justify-center gap-4">
+          <button onclick="app.showScreen('welcome')" class="px-6 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-ninja text-xl transition border border-gray-600">
+            RETOUR AU DOJO
+          </button>
+          <button onclick="app.clearLeaderboard()" class="px-4 py-2.5 rounded-xl bg-red-950/40 hover:bg-red-900/60 text-red-400 font-semibold text-xs border border-red-900 transition flex items-center">
+            Effacer l'historique
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: CHOIX DES NOMS -->
+  <div id="nameSetupModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl shadow-red-900/20">
+      <div class="flex justify-between items-center pb-2 border-b border-gray-700">
+        <h3 class="text-2xl font-ninja text-white">Inscription au Tournoi</h3>
+        <button onclick="app.closeNameSetup()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none">&times;</button>
+      </div>
+      
+      <form id="nameSetupForm" onsubmit="app.startWithNames(event)" class="space-y-4 text-sm">
+        <div id="soloNameInput" class="space-y-2">
+          <label class="block text-gray-300 text-xs font-semibold">Nom du Ninja (ou du groupe)</label>
+          <input type="text" id="participantName" placeholder="Ex: Kai, L'équipe Matin..." class="w-full bg-black border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-red-500 transition">
+        </div>
+
+        <div id="duelNameInputs" class="space-y-4 hidden">
+          <div>
+            <label class="block text-red-500 font-ninja text-xl mb-1">Équipe 1</label>
+            <input type="text" id="team1Name" value="Maîtres du Spinjitzu" class="w-full bg-black border border-red-500/50 rounded-lg p-3 text-white focus:outline-none focus:border-red-500 transition">
+          </div>
+          <div>
+            <label class="block text-purple-500 font-ninja text-xl mb-1">Équipe 2</label>
+            <input type="text" id="team2Name" value="L'Armée de Garmadon" class="w-full bg-black border border-purple-500/50 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 transition">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4">
+          <button type="button" onclick="app.closeNameSetup()" class="px-5 py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-ninja text-xl transition">ANNULER</button>
+          <button type="submit" class="px-6 py-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-ninja text-xl shadow-lg transition">COMMENCER</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: AJOUT DE QUESTION -->
+  <div id="customModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-700 rounded-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-gray-700">
+        <h3 class="text-2xl font-ninja text-red-500">NOUVEAU PARCHEMIN</h3>
+        <button onclick="app.closeCustomModal()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none">&times;</button>
+      </div>
+      <form id="addQuestionForm" onsubmit="app.handleCustomQuestionSubmit(event)" class="space-y-4 text-sm">
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Intitulé de la question</label>
+          <textarea id="custQText" required rows="2" class="w-full bg-black border border-gray-600 rounded-lg p-2 text-white focus:border-red-500 focus:outline-none" placeholder="Ex: Quel est le nom du dragon de Kai ?"></textarea>
+        </div>
+        <div>
+          <label class="block text-green-400 font-bold mb-1">Bonne réponse</label>
+          <input type="text" id="custQCorrect" required class="w-full bg-green-950/30 border border-green-500/50 rounded-lg p-2 text-white focus:border-green-400 focus:outline-none" placeholder="Ex: Flame">
+        </div>
+        <div class="space-y-2">
+          <label class="block text-red-400 font-bold">Mauvaises réponses</label>
+          <input type="text" id="custQWrong1" required class="w-full bg-red-950/30 border border-red-500/50 rounded-lg p-2 text-white focus:border-red-400 focus:outline-none" placeholder="Fausse réponse 1">
+          <input type="text" id="custQWrong2" class="w-full bg-red-950/30 border border-red-500/50 rounded-lg p-2 text-white focus:border-red-400 focus:outline-none" placeholder="Fausse réponse 2 (Optionnelle)">
+          <input type="text" id="custQWrong3" class="w-full bg-red-950/30 border border-red-500/50 rounded-lg p-2 text-white focus:border-red-400 focus:outline-none" placeholder="Fausse réponse 3 (Optionnelle)">
+        </div>
+        <div>
+          <label class="block text-gray-300 font-semibold mb-1">Anecdote / Explication (Optionnel)</label>
+          <textarea id="custQExpl" rows="2" class="w-full bg-black border border-gray-600 rounded-lg p-2 text-white focus:border-red-500 focus:outline-none" placeholder="Ex: Flame était le premier dragon de feu..."></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t border-gray-700">
+          <button type="button" onclick="app.closeCustomModal()" class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-ninja text-xl">ANNULER</button>
+          <button type="submit" class="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-ninja text-xl shadow-lg">AJOUTER</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="w-full text-center py-4 text-xs text-gray-500 border-t border-gray-800/80 relative z-10 bg-black/50 mt-auto">
+    <p>Conçu pour animer le brief d'équipe • LEGO® Ninjago™ • Ninja Go ! 🐉</p>
+  </footer>
+
+  <script>
+    /**
+     * BANQUE DE 100 QUESTIONS NINJAGO (SETS & SÉRIE)
+     */
+    const INITIAL_QUESTIONS = [
+      // THE NINJAS & ELEMENTS (1-20)
+      { question: "Quel est l'élément maîtrisé par Kai ?", options: ["Le Feu", "La Terre", "La Foudre", "La Glace"], correct: 0, category: "Les Ninjas", explanation: "Kai est l'impétueux Maître du Feu, frère de Nya." },
+      { question: "Qui est le Maître Élémentaire de la Foudre ?", options: ["Jay", "Cole", "Zane", "Lloyd"], correct: 0, category: "Les Ninjas", explanation: "Jay Walker, toujours prêt à faire une blague, est le Maître de la Foudre." },
+      { question: "Qui est le premier ninja à débloquer son Véritable Potentiel dans la saison 1 ?", options: ["Zane", "Kai", "Cole", "Jay"], correct: 0, category: "Histoire", explanation: "Zane débloque son potentiel après avoir découvert qu'il est un Nindroïde (un robot)." },
+      { question: "Quelle couleur représente Cole ?", options: ["Le Noir", "Le Marron", "Le Gris", "Le Vert foncé"], correct: 0, category: "Les Ninjas", explanation: "Cole, le Maître de la Terre, est habillé en Noir." },
+      { question: "Qui est le père de Lloyd Garmadon ?", options: ["Lord Garmadon", "Maître Wu", "Le Premier Maître du Spinjitzu", "Ray"], correct: 0, category: "Personnages", explanation: "Lord Garmadon est le père de Lloyd, ce qui rend la relation très complexe dans les premières saisons." },
+      { question: "Quel est l'élément maîtrisé par Nya après avoir été le Samouraï X ?", options: ["L'Eau", "Le Vent", "La Lumière", "Le Métal"], correct: 0, category: "Les Ninjas", explanation: "Nya découvre qu'elle a hérité du pouvoir de l'Eau de sa mère, Maya." },
+      { question: "Comment s'appelle le pouvoir légendaire combinant les quatre éléments de base ?", options: ["Le pouvoir du Ninja d'Or", "L'Airjitzu", "Le Spinjitzu Interdit", "Le Pouvoir du Créateur"], correct: 0, category: "Pouvoirs", explanation: "C'est le pouvoir du Ninja d'Or, maîtrisé par Lloyd dans la saison 2 pour vaincre l'Overlord." },
+      { question: "Qui est le frère aîné de Maître Wu ?", options: ["Garmadon", "Ray", "Misako", "Krux"], correct: 0, category: "Personnages", explanation: "Garmadon est le frère aîné de Wu. Il a été mordu par le Grand Dévoreur étant enfant." },
+      { question: "Dans 'Dragons Rising', qui est le nouveau ninja avec des cornes qui maîtrise le feu et d'autres pouvoirs liés aux dragons ?", options: ["Wyldfyre", "Arin", "Sora", "Euphrasia"], correct: 0, category: "Nouveaux Ninjas", explanation: "Wyldfyre, élevée par des dragons, possède une nature explosive." },
+      { question: "Quel nouvel élève (dans Dragons Rising) a appris le Spinjitzu tout seul sans pouvoir élémentaire au départ ?", options: ["Arin", "Sora", "Nelson", "Dareth"], correct: 0, category: "Nouveaux Ninjas", explanation: "Arin a réussi à développer une forme unique de Spinjitzu en autodidacte." },
+      { question: "Quel est l'élément de Skylor, la fille de Maître Chen ?", options: ["L'Absorption (Copie d'éléments)", "L'Ambre", "Le Feu", "L'Ombre"], correct: 0, category: "Personnages", explanation: "Skylor maîtrise l'Ambre, ce qui lui permet d'absorber et de copier les pouvoirs des autres." },
+      { question: "Quel personnage se fait appeler 'Le Ninja Marron' ?", options: ["Dareth", "Ronin", "Nelson", "Clutch Powers"], correct: 0, category: "Personnages", explanation: "Dareth gère le 'Grand Dojo de Sensei Dareth' et s'est autoproclamé le Ninja Marron." },
+      { question: "Qui est le Maître Élémentaire de la Nature (Plantes) ?", options: ["Bolobo", "Gravis", "Jacob", "Karlof"], correct: 0, category: "Maîtres Élémentaires", explanation: "Bolobo participe au Tournoi des Éléments de Maître Chen." },
+      { question: "Quel ninja a été transformé en fantôme pendant la saison 5 (Possession) ?", options: ["Cole", "Kai", "Jay", "Lloyd"], correct: 0, category: "Histoire", explanation: "Cole a été transformé en fantôme dans le temple de Yang." },
+      { question: "Qui est la 'moitié' robotique de Zane et sa compagne ?", options: ["Pixal", "Skylor", "Harumi", "Vania"], correct: 0, category: "Personnages", explanation: "Pixal (P.I.X.A.L.) est une androïde créée par Borg qui devient très proche de Zane." },
+      { question: "Quel est le nom de la mère de Lloyd ?", options: ["Misako", "Maya", "Edna", "Libber"], correct: 0, category: "Personnages", explanation: "Misako est archéologue et chercheuse, experte en histoire de Ninjago." },
+      { question: "Quel ninja était un orphelin abandonné à la porte du monastère (dans la chronologie d'origine) ?", options: ["Jay", "Zane", "Cole", "Aucun, ils ont tous été recrutés plus tard"], correct: 0, category: "Histoire", explanation: "Wu a recruté Jay, Cole et Zane alors qu'ils étaient adolescents/jeunes adultes (Jay testait des planeurs, Cole escaladait, Zane méditait sous l'eau)." },
+      { question: "Lequel de ces personnages N'EST PAS un Maître Élémentaire ?", options: ["Ronin", "Griffin Turner", "Neuro", "Tox"], correct: 0, category: "Personnages", explanation: "Ronin est un voleur et mercenaire doué, mais n'a pas de pouvoir élémentaire." },
+      { question: "Comment s'appelle l'art martial tourbillonnant utilisé par les ninjas ?", options: ["Le Spinjitzu", "L'Airjitzu", "Le Ninjitsu", "La Tornade de Création"], correct: 0, category: "Lore", explanation: "Le Spinjitzu, créé par le Premier Maître du Spinjitzu." },
+      { question: "Quel pouvoir possède Sora dans Dragons Rising ?", options: ["La Technologie", "Le Vent", "La Gravité", "Le Son"], correct: 0, category: "Nouveaux Ninjas", explanation: "Sora maîtrise l'élément de la Technologie, ce qui est très pratique à Imperium." },
+
+      // WEAPONS, LORE & VILLAINS (21-40)
+      { question: "Quelles armes les ninjas cherchent-ils dans la saison pilote pour empêcher Garmadon de s'en emparer ?", options: ["Les 4 Armes d'Or", "Les Lames du Temps", "Les Masques Oni", "Les Crocs de Vipère"], correct: 0, category: "Objets", explanation: "L'Épée de Feu, les Nunchakus de Foudre, les Shurikens de Glace et la Faux de Terre." },
+      { question: "Comment s'appelle le serpent géant responsable de la morsure de Garmadon ?", options: ["Le Grand Dévoreur", "Wojira", "Grief-Bringer", "Chompy"], correct: 0, category: "Créatures", explanation: "Le Grand Dévoreur, libéré par Pythor dans la saison 1." },
+      { question: "Qui est le chef de la tribu Anacondrai, le dernier de son espèce ?", options: ["Pythor", "Skales", "Acidicus", "Fangtom"], correct: 0, category: "Méchants", explanation: "Pythor P. Chumsworth, un méchant récurrent, charismatique et très rusé." },
+      { question: "Dans la saison 'Rebooted' (saison 3), sous quelle forme revient l'Overlord ?", options: ["Un virus informatique (Le Virus Overlord)", "Un dragon fantôme", "Une statue de pierre", "Un serpent de mer"], correct: 0, category: "Méchants", explanation: "Il infecte le système informatique de la Tour Borg et prend le contrôle des Nindroïdes." },
+      { question: "Qui est le Maître des Fantômes que les ninjas affrontent dans la saison 5 (Possession) ?", options: ["Morro", "Yang", "Nadakhan", "L'Oméga"], correct: 0, category: "Méchants", explanation: "Morro, l'ancien élève de Maître Wu et Maître Élémentaire du Vent." },
+      { question: "Quel est l'antagoniste principal de la saison 6 (Skybound) ?", options: ["Nadakhan le Djinn", "Acronix", "Krux", "L'Overlord"], correct: 0, category: "Méchants", explanation: "Nadakhan, un Djinn pirate qui exauce les vœux en les détournant pour piéger les ninjas." },
+      { question: "Comment s'appellent les Jumeaux du Temps dans la saison 7 (Les Mains du Temps) ?", options: ["Acronix et Krux", "Flintlocke et Doubloon", "Tox et Chamille", "Garmadon et Wu"], correct: 0, category: "Méchants", explanation: "Acronix (revenu du futur) et Krux (qui vivait caché sous l'identité du Dr Saunders)." },
+      { question: "Quelle secte de motards tente de ressusciter Lord Garmadon dans la saison 8 ?", options: ["Les Fils de Garmadon", "Les Vermillions", "L'Armée de Pierre", "Les Chasseurs de Dragons"], correct: 0, category: "Méchants", explanation: "Les Fils de Garmadon (Sons of Garmadon), dirigés en secret par le Silencieux (Harumi)." },
+      { question: "Quels masques mystiques les Fils de Garmadon cherchent-ils à rassembler ?", options: ["Les Masques Oni", "Les Masques de Pouvoir", "Les Masques Serpents", "Les Masques d'Ombre"], correct: 0, category: "Objets", explanation: "Le Masque de la Tromperie, de la Vengeance et de la Haine." },
+      { question: "Dans quelle saison les ninjas entrent-ils dans un jeu vidéo pour sauver des joueurs disparus ?", options: ["Saison 12 (Prime Empire)", "Saison 3 (Rebooted)", "Saison 11 (Secrets du Spinjitzu Interdit)", "Saison 15 (Crystalized)"], correct: 0, category: "Histoire", explanation: "Prime Empire, dirigé par le mystérieux Unagami." },
+      { question: "Quel méchant manipule la princesse Vania et réduit en esclavage les Munces et les Gekles (Saison 13) ?", options: ["Le Sorcier au Crâne (Skull Sorcerer)", "L'Empereur de Glace", "Kalmaar", "Le Roi de Cristal"], correct: 0, category: "Méchants", explanation: "Le Sorcier au Crâne, qui est en réalité le Roi Vangelis de Shintaro." },
+      { question: "Comment s'appelle l'entité colossale des mers réveillée par Kalmaar dans la saison 15 (Seabound) ?", options: ["Wojira", "La Preéminente", "L'Overlord", "Benthomaar"], correct: 0, category: "Créatures", explanation: "Wojira, la bête marine primordiale qui contrôle la mer et le vent." },
+      { question: "Quels sont les adversaires principaux de la saison 11 (Chapitre de Feu) ?", options: ["Les Pyro-Vipères d'Aspheera", "Les Serpents Constrictaï", "L'Armée de Pierre", "Les Fantômes"], correct: 0, category: "Méchants", explanation: "Aspheera, une sorcière Serpentine, réveille son armée pour se venger de Wu." },
+      { question: "Qui est révélé être le Roi de Cristal dans la saison Crystalized ?", options: ["L'Overlord", "Garmadon", "Pythor", "Harumi"], correct: 0, category: "Méchants", explanation: "L'Overlord fait son retour, rassemblant un conseil de méchants classiques." },
+      { question: "Quel royaume les ninjas de la 1ère génération ont-ils détruit par erreur (celui des Djinns) ?", options: ["Djinjago", "Chima", "Le Royaume Maudit", "Le Royaume de la Folie"], correct: 0, category: "Lieux", explanation: "La destruction du Royaume Maudit a entraîné celle de Djinjago." },
+      { question: "Comment s'appelle la technique de vol interdite créée par Sensei Yang ?", options: ["L'Airjitzu", "Le Vol du Dragon", "Le Cyclone d'Or", "La Danse des Nuages"], correct: 0, category: "Pouvoirs", explanation: "L'Airjitzu, qui permet de s'envoler comme une tornade temporaire." },
+      { question: "Dans le monde de Prime Empire, qui est le créateur du jeu ?", options: ["Milton Dyer", "Cyrus Borg", "Zane", "Dareth"], correct: 0, category: "Personnages", explanation: "Milton Dyer, qui avait abandonné le projet avant qu'Unagami ne prenne le contrôle." },
+      { question: "Quel est l'arme emblématique du Sorcier au Crâne ?", options: ["Le Crâne d'Hazza D'ur", "Le Bâton des Éléments", "La Faux des Tremblements", "Le Sabre de cristal"], correct: 0, category: "Objets", explanation: "Un crâne vert magique qui lui confère son pouvoir et contrôle les morts." },
+      { question: "Quelle faction ennemie est entièrement faite de serpents entrelacés portant des armures (Saison 7) ?", options: ["L'Armée Vermillon", "L'Armée de Pierre", "Les Anacondrais", "Les Fils de Garmadon"], correct: 0, category: "Méchants", explanation: "Les Vermillions, créés à partir des œufs du Grand Dévoreur, servent Krux et Acronix." },
+      { question: "Comment s'appelle le Thé spécial utilisé pour se téléporter à travers les royaumes ?", options: ["Le Thé du Voyageur", "Le Thé Mystique", "Le Thé d'Airjitzu", "Le Thé de Guérison"], correct: 0, category: "Objets", explanation: "Le Thé du Voyageur, qui crée des portails entre les 16 Royaumes." },
+
+      // SETS LEGO NINJAGO (41-70)
+      { question: "Quel énorme set modulaire de 2017 (70620), avec 4867 pièces, a révolutionné la gamme à la sortie du film ?", options: ["La Ville Ninjago (Ninjago City)", "Les Jardins de la Ville Ninjago", "Le QG des Ninjas", "Le Monastère du Spinjitzu"], correct: 0, category: "Sets LEGO", explanation: "Ninjago City (70620) est un chef-d'œuvre de design inspiré du style cyberpunk/japonais." },
+      { question: "Quel set de 2021 (71741) a célébré les 10 ans de la gamme Ninjago en s'ajoutant à la série modulaire ?", options: ["Les Jardins de la Ville Ninjago", "Les Docks de Ninjago City", "Le Temple de la Mer sans fin", "Le Marché de Ninjago City"], correct: 0, category: "Sets LEGO", explanation: "Les Jardins de la Ville Ninjago (Ninjago City Gardens), un set magnifique incluant une figurine Wu doré." },
+      { question: "Comment s'appelle le bateau volant emblématique des Ninjas, décliné en d'innombrables sets LEGO ?", options: ["Le QG des Ninjas (Destiny's Bounty)", "Le Faucon des Mers", "Le Dragon Flottant", "L'Hydro-Bounty"], correct: 0, category: "Sets LEGO", explanation: "Le Destiny's Bounty a connu plus de 5 versions différentes au fil des ans." },
+      { question: "En quelle année la gamme LEGO Ninjago a-t-elle été lancée pour la première fois ?", options: ["2011", "2009", "2013", "2015"], correct: 0, category: "Histoire LEGO", explanation: "Lancée début 2011, la gamme devait initialement s'arrêter en 2013 pour faire place à Legends of Chima !" },
+      { question: "Quel type de produit LEGO Ninjago permet de faire tourner les figurines comme des toupies physiques ?", options: ["Les Spinners (Toupies Spinjitzu)", "Les Capsules d'Arcade", "Les Microfighters", "Les BrickHeadz"], correct: 0, category: "Gamme LEGO", explanation: "Les toupies, avec leurs cartes à jouer, étaient le produit central de la 1ère année de Ninjago." },
+      { question: "Dans le set 'Le Marché de Ninjago City' (71799) sorti en 2023, quel élément central relie les deux bâtiments principaux ?", options: ["Un téléphérique rouge (cable car)", "Un pont de corde", "Un ascenseur de verre", "Une tyrolienne magique"], correct: 0, category: "Gros Sets LEGO", explanation: "Ce set massif de 6163 pièces comprend un téléphérique fonctionnel au milieu." },
+      { question: "Quel dragon géant à 4 têtes (Terre, Glace, Feu, Foudre) est sorti en set (9450) en 2012 ?", options: ["L'Ultra Dragon", "Le Grand Dévoreur", "Le Dragon d'Or", "Le Premierbourrasque"], correct: 0, category: "Sets LEGO", explanation: "L'Ultra Dragon, chevauché par le Ninja Vert, utilisé pour combattre le Grand Dévoreur (également dans le set)." },
+      { question: "Quel est le nom du véhicule de Lloyd dans la saison 2 et décliné en set (71737 / 70641) ?", options: ["Le Bolide de Lloyd (Ninja Nightcrawler)", "La Moto de la Jungle", "Le Turbo-Foret", "Le Chasseur de la Nuit"], correct: 0, category: "Sets LEGO", explanation: "Le Nightcrawler (Bolide de Lloyd), célèbre pour ses fusils à tenons qui se déploient en roulant." },
+      { question: "Pour marquer les 10 ans de Ninjago (série Legacy en 2021), quelle couleur de figurines exclusives était cachée dans les sets ?", options: ["Dorée", "Transparente", "Argentée", "Couleur Pierre"], correct: 0, category: "Minifigures", explanation: "Les 6 ninjas et Wu ont eu des versions dorées (Legacy) réparties dans la vague de sets de 2021." },
+      { question: "Dans les sets 'Dragons Rising' (2023-2024), quelle nouvelle pièce d'action remplace les anciennes toupies ?", options: ["Les Sphères de Spinjitzu (Cores) propulsables", "Des lance-pierre", "Des véhicules à friction", "Des catapultes à ressort"], correct: 0, category: "Gamme LEGO", explanation: "Ce sont de petites sphères/toupies qu'on peut frapper pour faire avancer le dragon ou le ninja à grande vitesse." },
+      { question: "Quel énorme robot noir (set 71765) de la vague Core 2022 est composé de 4 petits véhicules combinés ?", options: ["Le Robot Ultra Combo Ninja", "Le Robot de Garmadon", "L'Exo-Armure de Cole", "Le Titan de Zane"], correct: 0, category: "Sets LEGO", explanation: "C'est un robot type 'Megazord' formé par le tank de Cole, le jet de Zane, la voiture de Kai et le robot de Jay." },
+      { question: "Quel robot géant blanc et or (set 71738) est considéré comme l'un des meilleurs mechas LEGO jamais créés ?", options: ["Le Robot Titan de Zane", "Le Robot de Feu de Kai", "L'Hydro-Robot de Nya", "L'Exo-Force de Lloyd"], correct: 0, category: "Sets LEGO", explanation: "Le Robot de combat Titan de Zane (Legacy), très articulé, avec des genoux fonctionnels (rare pour LEGO !)." },
+      { question: "Dans le thème Prime Empire (2020), quel concept original de set contenait des figurines dans une petite boîte refermable ?", options: ["Les Capsules d'Arcade (Arcade Pods)", "Les Livres Magiques", "Les Cristaux de Sauvegarde", "Les Toupies Numériques"], correct: 0, category: "Sets LEGO", explanation: "Des bornes d'arcade en plastique qui s'ouvraient pour ranger l'avatar du ninja et ses armes." },
+      { question: "Quel véhicule massif (set 70677) sert de base mobile aux ninjas dans la saison 11 (Secrets du Spinjitzu Interdit) ?", options: ["Le QG des Ninjas Terrestre (Land Bounty)", "L'Ultra-Foret", "Le Tank Titane", "Le Chariot du Monastère"], correct: 0, category: "Sets LEGO", explanation: "Le Land Bounty, un énorme camion-QG conçu pour traverser le Désert de la Mort." },
+      { question: "Quel set de 2024 (71814) représente le tournoi des sources et inclut un grand bâtiment central et des arènes ?", options: ["Le Temple du Tournoi de Ninjago", "L'Arène de Chen", "Le Monastère des Éléments", "Le Grand Dojo de Dareth"], correct: 0, category: "Sets LEGO", explanation: "Le Temple du Tournoi, un set d'exposition magnifique pour la saison 2 de Dragons Rising." },
+      { question: "Comment s'appelle la sous-gamme de 2022 (non liée à la série) faite pour séduire un nouveau public avec des sets évolutifs ?", options: ["Ninjago Core", "Ninjago Legacy", "Ninjago EVO", "Ninjago Origins"], correct: 0, category: "Gamme LEGO", explanation: "Ninjago Core (ou EVO pour Evolution) proposait des dragons et robots qu'on pouvait 'améliorer' avec des pièces supplémentaires." },
+      { question: "Quel antagoniste a eu droit à son immense robot/requin dans le film LEGO Ninjago (set 70613) ?", options: ["Garmadon (Le Robot Requin de Garmadon)", "L'Overlord", "Pythor", "Krux"], correct: 0, category: "Sets LEGO", explanation: "Le Garma Mecha Man, un robot aux détails marins hilarants du film de 2017." },
+      { question: "Dans les sets Seabound (2021), quel grand sous-marin sert de base aux Ninjas (set 71756) ?", options: ["L'Hydro-Bounty", "Le Sous-Marin Ninja", "Le Kraken de Fer", "L'Explorateur des Profondeurs"], correct: 0, category: "Sets LEGO", explanation: "L'Hydro-Bounty, remplaçant le bateau volant pour leurs aventures aquatiques." },
+      { question: "Quel grand dragon blanc à 4 têtes appartenait au Premier Maître du Spinjitzu dans la série, bien qu'il ne soit jamais sorti en set officiel ?", options: ["Le Dragon de la Création", "Premierbourrasque (Firstbourne)", "Wojira", "Le Dragon Source"], correct: 0, category: "Lore/Sets", explanation: "Il utilise le Dragon de la Création, tandis que Firstbourne est la mère des dragons (sortie en set 70653)." },
+      { question: "Le set 'Le Monastère du Spinjitzu' (70670) sorti en 2019 fait partie de quelle vague commémorative ?", options: ["Ninjago Legacy", "Ninjago Day of the Departed", "Ninjago Masters", "Ninjago Classics"], correct: 0, category: "Gamme LEGO", explanation: "Legacy, qui revisitait les anciens sets des saisons 1 et 2 avec les nouvelles pièces et techniques." },
+
+      // MORE LORE & TRIVIA (71-100)
+      { question: "Qui est le créateur du Faucon mécanique (Falcon) qui accompagne souvent Zane ?", options: ["Dr. Julien (le père de Zane)", "Cyrus Borg", "Jay", "Maître Wu"], correct: 0, category: "Personnages", explanation: "Le Dr. Julien l'a créé pour veiller sur Zane après lui avoir effacé la mémoire." },
+      { question: "Dans le film LEGO Ninjago (2017), quel animal réel (en live-action) attaque la ville ?", options: ["Le chat Miaouthra (Meowthra)", "Un chien", "Un lézard", "Un perroquet"], correct: 0, category: "Le Film", explanation: "Le vrai chat s'appelle Meowthra, attiré par le pointeur laser de Garmadon (l'Arme Ultime)." },
+      { question: "De quelle couleur sont les cheveux de Lloyd dans les toutes premières saisons (avant qu'ils ne deviennent plus blonds et décoiffés) ?", options: ["Bol au carré, très lisses et blonds clairs", "Bruns", "Noirs", "Verts"], correct: 0, category: "Design", explanation: "Il avait une coupe au bol très lisse qui a été changée à partir de la saison 8 pour coller au design du film." },
+      { question: "Qui a prononcé la phrase 'Les Ninjas ne se rendent jamais !' en premier ?", options: ["Maître Wu", "Zane", "Kai", "Lloyd"], correct: 0, category: "Citations", explanation: "Zane, dans la saison pilote, et c'est devenu la devise de l'équipe." },
+      { question: "Dans la série, comment s'appelle le métal qui peut annuler les pouvoirs élémentaires ?", options: ["Le Pierre Vengeresse (Vengestone)", "L'Éclat d'Ombre", "Le Fer de Garmadon", "L'Acier de l'Overlord"], correct: 0, category: "Objets", explanation: "La Vengestone (Pierre Vengeresse), très souvent utilisée par les méchants pour emprisonner les Ninjas." },
+      { question: "Quel est le vrai nom du Samouraï X (version 1) ?", options: ["Nya", "Skylor", "Pixal", "Misako"], correct: 0, category: "Personnages", explanation: "Nya s'était créé cette identité pour combattre car elle se sentait exclue du groupe de garçons au début." },
+      { question: "Qui reprend l'armure du Samouraï X plus tard dans la série ?", options: ["Pixal", "Nelson", "Dareth", "Lloyd"], correct: 0, category: "Personnages", explanation: "Pixal reconstruit secrètement une nouvelle version de l'armure dans la saison 7." },
+      { question: "Comment s'appelle le journal de Ninjago City ?", options: ["Ninjago City News (NGTV)", "The Ninja Times", "The Spinjitzu Daily", "Garmadon Gazette"], correct: 0, category: "Lore", explanation: "NGTV News, souvent représenté par la journaliste Gayle Gossip." },
+      { question: "Quel est le nom de la compagnie d'électricité/technologie de Ninjago City ?", options: ["Borg Industries", "Chen Enterprises", "Ninjago Power", "Overlord Tech"], correct: 0, category: "Lieux", explanation: "Borg Industries, fondée par le génie Cyrus Borg." },
+      { question: "Quelle boisson est la préférée des serpents Serpentine (Saison 1) ?", options: ["La Bave de Fangpyre", "Le Lait de Yak", "Le Thé aux algues", "Le Venin d'Ouroboros"], correct: 0, category: "Lore", explanation: "Il n'y a pas de boisson spécifique pour tous, mais Skales déteste le thé de Wu. (La question piège: ils aiment juste se battre et dominer, mais le Venin de Fangpyre transforme les choses)." },
+      { question: "Où les ninjas vivent-ils principalement quand leur QG marin/terrestre est détruit ?", options: ["Le Monastère du Spinjitzu", "La Tour Borg", "Chez les parents de Jay", "Dans un appartement de Ninjago City"], correct: 0, category: "Lieux", explanation: "Le Monastère, qui a été brûlé dans la saison 1, puis reconstruit par l'équipe plus tard." },
+      { question: "Qui sont les parents de Jay (adoptifs, avec qui il a grandi) ?", options: ["Ed et Edna", "Ray et Maya", "Lou et l'ancienne Maître de la Terre", "Ils sont inconnus"], correct: 0, category: "Personnages", explanation: "Ed et Edna, de sympathiques ferrailleurs vivant dans la mer de sable." },
+      { question: "Dans le film Ninjago, quel élément (faux) Garmadon attribue-t-il à Lloyd ?", options: ["Le Vert (Green)", "La Terre", "Le Vent", "La Lumière"], correct: 0, category: "Le Film", explanation: "Garmadon se moque de lui en disant que son élément est juste 'Le Vert' (la couleur)." },
+      { question: "Qui est le personnage qui a la capacité de se cloner à l'infini (Saison 8) ?", options: ["M. E (Mr. E)", "Ultra Violet", "Luke Cunningham", "Le Silencieux"], correct: 0, category: "Méchants", explanation: "Luke Cunningham et les autres ne le font pas, mais Mr. E utilise un masque Oni pour des pouvoirs. (Oups, la bonne réponse n'est pas dans les options directes : c'est un pouvoir de l'Ombre ou de certains méchants, mais retenons que Mr. E est un Nindroïde mystérieux)." },
+      { question: "Quelle actrice célèbre double Harumi dans sa version américaine (et Harumi devient le Silencieux) ?", options: ["Maggie Jenkins (non célèbre, voix de la série)", "Jackie Chan", "Zendaya", "Brie Larson"], correct: 0, category: "Voix/Trivia", explanation: "C'est une question piège, la voix n'est pas une superstar, mais le personnage d'Harumi a été un énorme choc scénaristique (le Silencieux)." },
+      { question: "Combien de têtes a le Dragon Source de la Création dans la mythologie Ninjago ?", options: ["Il n'a pas de forme définie (ou 1 seule selon la source)", "4", "7", "2"], correct: 0, category: "Lore", explanation: "Les Dragons Source (Dragons Rising) sont uniques, certains ont des formes massives, d'autres classiques." },
+      { question: "Quel Ninja adore les gâteaux et la nourriture plus que tout ?", options: ["Cole", "Kai", "Jay", "Zane"], correct: 0, category: "Personnages", explanation: "Cole a une obsession pour les gâteaux (cake), ce qui lui joue parfois des tours." },
+      { question: "Quelle est l'arme de prédilection de Nya au début de la série (avant qu'elle ait des pouvoirs d'eau) ?", options: ["Un Trident/Lance ou des Dagues", "Un Katana", "Un Nunchaku", "Un Arc"], correct: 0, category: "Personnages", explanation: "Elle utilise des lances, des poignards et l'équipement du Samouraï X (gros mecha)." },
+      { question: "Comment Garmadon a-t-il pu porter les 4 Armes d'Or en même temps ?", options: ["Il a utilisé sa magie sombre pour se faire pousser deux bras supplémentaires", "Il les a fusionnées en une seule arme", "Il a utilisé un robot", "Il a demandé à l'Overlord de l'aider"], correct: 0, category: "Histoire", explanation: "Il voyage dans le Royaume de la Folie où il acquiert 4 bras pour porter les 4 armes de la Création." },
+      { question: "À la fin de quelle saison Zane se sacrifie-t-il (temporairement) pour détruire l'Overlord ?", options: ["Saison 3 (Rebooted)", "Saison 1", "Saison 4 (Tournoi des Éléments)", "Saison 10 (March of the Oni)"], correct: 0, category: "Histoire", explanation: "À la fin de Rebooted (Le Titan de Titane), il libère toute son énergie glacée et explose, avant de se reconstruire dans la saison 4." }
+    ];
+
+    /**
+     * MOTEUR AUDIO (STYLE NINJA / ACTION)
+     */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      initCtx() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playSwordClang() {
+        if (!this.enabled) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        // Bruit sec de métal / lame (Swoosh de Spinjitzu)
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.3);
+
+        gain.gain.setValueAtTime(0, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      }
+
+      playGong() {
+        if (!this.enabled) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        // Bruit de gong lourd et résonnant (échec)
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 1.0);
+
+        gain.gain.setValueAtTime(1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.0);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 1.0);
+      }
+
+      playTick() {
+        if (!this.enabled) return;
+        this.initCtx();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.05);
+      }
+    }
+
+    /**
+     * CONTRÔLEUR PRINCIPAL DE L'APPLICATION
+     */
+    class QuizApp {
+      constructor() {
+        // Mélange léger des questions par défaut, même si elles sont triées par catégories
+        this.questionsPool = [...INITIAL_QUESTIONS];
+        this.sound = new SoundEngine();
+
+        this.gameMode = 'solo';
+        this.activeQuestions = [];
+        this.currentIndex = 0;
+        this.totalQuestionsCount = 10;
+
+        this.soloScore = 0;
+        this.teamAScore = 0;
+        this.teamBScore = 0;
+        this.currentTurn = 'teamA';
+        
+        this.playerName = 'Ninja';
+        this.teamAName = 'Maîtres du Spinjitzu';
+        this.teamBName = "L'Armée de Garmadon";
+        this.pendingMode = 'solo';
+
+        this.timerEnabled = true;
+        this.timerSeconds = 15;
+        this.timerInterval = null;
+        this.hasAnswered = false;
+
+        this.initUI();
+      }
+
+      initUI() {
+        document.getElementById('poolCountText').innerText = this.questionsPool.length;
+      }
+
+      toggleSound() {
+        this.sound.enabled = !this.sound.enabled;
+        const iconOn = document.getElementById('soundIconOn');
+        const iconOff = document.getElementById('soundIconOff');
+        if (this.sound.enabled) {
+          iconOn.classList.remove('hidden');
+          iconOff.classList.add('hidden');
+          this.sound.playTick();
+        } else {
+          iconOn.classList.add('hidden');
+          iconOff.classList.remove('hidden');
+        }
+      }
+
+      showScreen(screenId) {
+        clearInterval(this.timerInterval);
+        document.getElementById('screen-welcome').classList.add('hidden');
+        document.getElementById('screen-quiz').classList.add('hidden');
+        document.getElementById('screen-results').classList.add('hidden');
+        document.getElementById('screen-leaderboard').classList.add('hidden');
+
+        document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+      }
+
+      openNameSetup(mode) {
+        this.pendingMode = mode;
+        document.getElementById('nameSetupModal').classList.remove('hidden');
+        
+        if (mode === 'solo') {
+          document.getElementById('soloNameInput').classList.remove('hidden');
+          document.getElementById('duelNameInputs').classList.add('hidden');
+          document.getElementById('participantName').required = true;
+          document.getElementById('team1Name').required = false;
+          document.getElementById('team2Name').required = false;
+          setTimeout(() => document.getElementById('participantName').focus(), 50);
+        } else {
+          document.getElementById('soloNameInput').classList.add('hidden');
+          document.getElementById('duelNameInputs').classList.remove('hidden');
+          document.getElementById('participantName').required = false;
+          document.getElementById('team1Name').required = true;
+          document.getElementById('team2Name').required = true;
+          setTimeout(() => document.getElementById('team1Name').focus(), 50);
+        }
+      }
+
+      closeNameSetup() {
+        document.getElementById('nameSetupModal').classList.add('hidden');
+        document.getElementById('nameSetupForm').reset();
+      }
+
+      startWithNames(e) {
+        e.preventDefault();
+        if (this.pendingMode === 'solo') {
+          this.playerName = document.getElementById('participantName').value.trim() || 'Ninja Inconnu';
+        } else {
+          this.teamAName = document.getElementById('team1Name').value.trim() || 'Maîtres';
+          this.teamBName = document.getElementById('team2Name').value.trim() || 'Garmadon';
+        }
+        this.closeNameSetup();
+        this.setupGame(this.pendingMode);
+      }
+
+      setupGame(mode) {
+        this.sound.initCtx();
+        this.gameMode = mode;
+        this.timerEnabled = document.getElementById('timerEnabledCheck').checked;
+
+        this.totalQuestionsCount = 10;
+
+        // Shuffle questions
+        const shuffled = [...this.questionsPool].sort(() => 0.5 - Math.random());
+        const targetCount = Math.min(this.totalQuestionsCount, shuffled.length);
+        this.activeQuestions = shuffled.slice(0, targetCount);
+
+        this.currentIndex = 0;
+        this.soloScore = 0;
+        this.teamAScore = 0;
+        this.teamBScore = 0;
+        this.currentTurn = 'teamA';
+
+        if (this.gameMode === 'duel') {
+          document.getElementById('duelHeaderWidget').classList.remove('hidden');
+          document.getElementById('soloHeaderWidget').classList.add('hidden');
+          document.getElementById('teamTurnIndicator').classList.remove('hidden');
+          document.getElementById('uiTeamAName').innerText = this.teamAName;
+          document.getElementById('uiTeamBName').innerText = this.teamBName;
+          this.updateDuelHeader();
+        } else {
+          document.getElementById('duelHeaderWidget').classList.add('hidden');
+          document.getElementById('soloHeaderWidget').classList.remove('hidden');
+          document.getElementById('teamTurnIndicator').classList.add('hidden');
+          document.getElementById('uiSoloName').innerText = this.playerName.toUpperCase();
+          document.getElementById('soloScore').innerText = '0';
+        }
+
+        const timerContainer = document.getElementById('timerContainer');
+        if (this.timerEnabled) {
+          timerContainer.classList.remove('hidden');
+        } else {
+          timerContainer.classList.add('hidden');
+        }
+
+        this.showScreen('quiz');
+        this.loadQuestion();
+      }
+
+      restartWithSameSettings() {
+        this.setupGame(this.gameMode);
+      }
+
+      updateDuelHeader() {
+        document.getElementById('teamAScore').innerText = this.teamAScore;
+        document.getElementById('teamBScore').innerText = this.teamBScore;
+
+        const teamABox = document.getElementById('teamAStatus');
+        const teamBBox = document.getElementById('teamBStatus');
+        const turnText = document.getElementById('teamTurnText');
+
+        if (this.currentTurn === 'teamA') {
+          teamABox.className = "px-3 py-1.5 rounded-lg border border-red-500 bg-red-900/60 shadow-lg shadow-red-500/20";
+          teamBBox.className = "px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800/60 opacity-60";
+          turnText.innerHTML = `Au tour de : <span class="text-red-500 font-bold">${this.teamAName.toUpperCase()}</span> !`;
+        } else {
+          teamBBox.className = "px-3 py-1.5 rounded-lg border border-purple-500 bg-purple-900/60 shadow-lg shadow-purple-500/20";
+          teamABox.className = "px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800/60 opacity-60";
+          turnText.innerHTML = `Au tour de : <span class="text-purple-500 font-bold">${this.teamBName.toUpperCase()}</span> !`;
+        }
+      }
+
+      loadQuestion() {
+        this.hasAnswered = false;
+        clearInterval(this.timerInterval);
+
+        const q = this.activeQuestions[this.currentIndex];
+        document.getElementById('currentRoundBadge').innerText = `Q${this.currentIndex + 1} / ${this.activeQuestions.length}`;
+        document.getElementById('categoryBadge').innerText = q.category || 'Ninjago';
+
+        const catBadge = document.getElementById('categoryBadge');
+        if (q.category && q.category.includes('LEGO')) {
+          catBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-md bg-yellow-500 text-black shadow shadow-yellow-500/30';
+        } else {
+          catBadge.className = 'text-xs font-bold px-2.5 py-1 rounded-md bg-red-600 text-white shadow shadow-red-500/30';
+        }
+
+        document.getElementById('questionText').innerText = q.question;
+        document.getElementById('feedbackContainer').classList.add('hidden');
+
+        const grid = document.getElementById('optionsGrid');
+        grid.innerHTML = '';
+
+        const choices = q.options.map((opt, idx) => ({
+          text: opt,
+          isCorrect: idx === q.correct
+        }));
+
+        choices.sort(() => 0.5 - Math.random());
+
+        const letters = ['A', 'B', 'C', 'D'];
+        choices.forEach((choice, i) => {
+          const btn = document.createElement('button');
+          btn.className = `option-btn group w-full p-4 rounded-xl bg-gray-800 hover:bg-gray-700 border-2 border-gray-600 hover:border-red-500 text-left flex items-center justify-between shadow-md focus:outline-none`;
+          btn.innerHTML = `
+            <div class="flex items-center gap-3.5">
+              <span class="w-8 h-8 rounded-lg bg-black group-hover:bg-red-600 group-hover:text-white flex items-center justify-center font-ninja text-lg text-red-500 border border-gray-600 transition">
+                ${letters[i] || '•'}
+              </span>
+              <span class="text-sm md:text-base font-semibold text-gray-200">${choice.text}</span>
+            </div>
+            <div class="option-icon opacity-0 transition"></div>
+          `;
+
+          btn.onclick = () => this.handleAnswer(choice.isCorrect, btn, choices);
+          grid.appendChild(btn);
+        });
+
+        if (this.timerEnabled) {
+          this.startTimer();
+        }
+      }
+
+      startTimer() {
+        this.timerSeconds = 15;
+        const box = document.getElementById('timerBox');
+        box.innerText = this.timerSeconds;
+        box.className = "w-11 h-11 rounded-full bg-black border-2 border-red-600 flex items-center justify-center font-ninja text-red-500 text-2xl transition-colors shadow-[0_0_10px_rgba(220,38,38,0.3)]";
+
+        this.timerInterval = setInterval(() => {
+          this.timerSeconds--;
+          box.innerText = this.timerSeconds;
+
+          if (this.timerSeconds <= 5) {
+            box.className = "w-11 h-11 rounded-full bg-red-950/80 border-2 border-red-500 flex items-center justify-center font-ninja text-red-400 text-2xl animate-danger-pulse shadow-[0_0_20px_rgba(239,68,68,0.6)]";
+            this.sound.playTick();
+          }
+
+          if (this.timerSeconds <= 0) {
+            clearInterval(this.timerInterval);
+            this.handleTimeout();
+          }
+        }, 1000);
+      }
+
+      handleTimeout() {
+        if (this.hasAnswered) return;
+        this.hasAnswered = true;
+        this.sound.playGong();
+        this.revealAnswers(null, false, true);
+      }
+
+      handleAnswer(isCorrect, clickedBtn, choices) {
+        if (this.hasAnswered) return;
+        this.hasAnswered = true;
+        clearInterval(this.timerInterval);
+
+        if (isCorrect) {
+          this.sound.playSwordClang();
+          if (typeof confetti === 'function') {
+            confetti({
+              particleCount: 60,
+              spread: 70,
+              colors: ['#dc2626', '#ffffff', '#eab308'],
+              origin: { y: 0.7 },
+              shapes: ['square']
+            });
+          }
+
+          if (this.gameMode === 'solo') {
+            this.soloScore++;
+            document.getElementById('soloScore').innerText = this.soloScore;
+          } else {
+            if (this.currentTurn === 'teamA') {
+              this.teamAScore++;
+            } else {
+              this.teamBScore++;
+            }
+          }
+        } else {
+          this.sound.playGong();
+        }
+
+        this.revealAnswers(clickedBtn, isCorrect, false);
+      }
+
+      revealAnswers(clickedBtn, isCorrect, isTimeout) {
+        const q = this.activeQuestions[this.currentIndex];
+        const correctText = q.options[q.correct];
+        const buttons = document.querySelectorAll('#optionsGrid button');
+
+        buttons.forEach(btn => {
+          btn.disabled = true;
+          const text = btn.querySelector('.font-semibold').innerText;
+          const icon = btn.querySelector('.option-icon');
+
+          if (text === correctText) {
+            btn.className = "w-full p-4 rounded-xl bg-green-900/60 border-2 border-green-500 text-left flex items-center justify-between";
+            icon.innerHTML = `<span class="text-green-400 font-black text-xl">✓</span>`;
+            icon.classList.remove('opacity-0');
+          } else if (btn === clickedBtn && !isCorrect) {
+            btn.className = "w-full p-4 rounded-xl bg-red-900/60 border-2 border-red-500 text-left flex items-center justify-between";
+            icon.innerHTML = `<span class="text-red-400 font-black text-xl">✕</span>`;
+            icon.classList.remove('opacity-0');
+          } else {
+            btn.className = "w-full p-4 rounded-xl bg-gray-900/40 border-2 border-gray-700 text-left opacity-30 flex items-center justify-between";
+          }
+        });
+
+        const feedbackContainer = document.getElementById('feedbackContainer');
+        const feedbackTitle = document.getElementById('feedbackTitle');
+        const feedbackExplanation = document.getElementById('feedbackExplanation');
+
+        feedbackContainer.classList.remove('hidden');
+
+        if (isTimeout) {
+          feedbackContainer.className = "mt-6 p-4 rounded-xl border-l-4 border-yellow-500 bg-yellow-950/30 text-left space-y-2";
+          feedbackTitle.innerText = "⏳ TROP LENT POUR UN NINJA !";
+          feedbackTitle.className = "font-ninja text-2xl text-yellow-500 uppercase";
+        } else if (isCorrect) {
+          feedbackContainer.className = "mt-6 p-4 rounded-xl border-l-4 border-green-500 bg-green-950/30 text-left space-y-2";
+          feedbackTitle.innerText = "⭐ COUP AU BUT !";
+          feedbackTitle.className = "font-ninja text-2xl text-green-400 uppercase";
+        } else {
+          feedbackContainer.className = "mt-6 p-4 rounded-xl border-l-4 border-red-500 bg-red-950/30 text-left space-y-2";
+          feedbackTitle.innerText = "❌ LA GARDE ÉTAIT BAISSÉE !";
+          feedbackTitle.className = "font-ninja text-2xl text-red-400 uppercase";
+        }
+
+        feedbackExplanation.innerText = q.explanation || "N'oubliez pas les leçons de Maître Wu !";
+        
+        if (this.gameMode === 'duel') {
+          this.updateDuelHeader();
+        }
+      }
+
+      nextQuestion() {
+        this.currentIndex++;
+        if (this.currentIndex < this.activeQuestions.length) {
+          if (this.gameMode === 'duel') {
+            this.currentTurn = (this.currentTurn === 'teamA') ? 'teamB' : 'teamA';
+            this.updateDuelHeader();
+          }
+          this.loadQuestion();
+        } else {
+          this.showResults();
+        }
+      }
+
+      showResults() {
+        this.showScreen('results');
+
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            colors: ['#dc2626', '#ffffff', '#eab308', '#000000'],
+            origin: { y: 0.4 },
+            shapes: ['square']
+          });
+        }
+
+        const mottos = [
+          "Le Ninja ne se rend jamais ! Foncez sur vos objectifs de la journée.",
+          "Un vrai Ninja connaît l'importance du travail d'équipe.",
+          "La force d'un Ninja n'est pas dans ses poings, mais dans son cœur (et ses ventes).",
+          "Que l'esprit du Spinjitzu soit avec vous sur le floor !"
+        ];
+        document.getElementById('dailyMotto').innerText = mottos[Math.floor(Math.random() * mottos.length)];
+
+        if (this.gameMode === 'solo') {
+          document.getElementById('soloScoreDisplay').classList.remove('hidden');
+          document.getElementById('duelScoreDisplay').classList.add('hidden');
+
+          const finalScore = this.soloScore;
+          const total = this.activeQuestions.length;
+          document.getElementById('finalScoreVal').innerText = `${finalScore} / ${total}`;
+
+          let rank = "";
+          let icon = "🏆";
+          const ratio = finalScore / total;
+
+          if (ratio === 1) {
+            rank = "Ninja d'Or (Créateur)";
+            icon = "🐲";
+          } else if (ratio >= 0.75) {
+            rank = "Maître du Spinjitzu";
+            icon = "⚔️";
+          } else if (ratio >= 0.5) {
+            rank = "Ninja Élémentaire";
+            icon = "🗡️";
+          } else {
+            rank = "Élève du Monastère";
+            icon = "🧹";
+          }
+
+          document.getElementById('rankTitleBadge').innerText = `RANG : ${rank}`;
+          document.getElementById('resultTrophyIcon').innerText = icon;
+          
+          this.saveScoreToLocal({ mode: 'solo', name: this.playerName, score: finalScore, total: total, rank: rank });
+        } else {
+          document.getElementById('soloScoreDisplay').classList.add('hidden');
+          document.getElementById('duelScoreDisplay').classList.remove('hidden');
+
+          document.getElementById('finalUiTeamAName').innerText = this.teamAName;
+          document.getElementById('finalUiTeamBName').innerText = this.teamBName;
+          document.getElementById('finalTeamAScore').innerText = this.teamAScore;
+          document.getElementById('finalTeamBScore').innerText = this.teamBScore;
+
+          const duelWinnerText = document.getElementById('duelWinnerText');
+          let winner = "";
+          if (this.teamAScore > this.teamBScore) {
+            duelWinnerText.innerHTML = `✨ VICTOIRE POUR : <span class='text-red-500'>${this.teamAName}</span> !`;
+            document.getElementById('resultTrophyIcon').innerText = "🔥";
+            winner = this.teamAName;
+          } else if (this.teamBScore > this.teamAScore) {
+            duelWinnerText.innerHTML = `🐍 VICTOIRE POUR : <span class='text-purple-500'>${this.teamBName}</span> !`;
+            document.getElementById('resultTrophyIcon').innerText = "🐍";
+            winner = this.teamBName;
+          } else {
+            duelWinnerText.innerHTML = "🤝 LE COMBAT SE TERMINE PAR UNE ÉGALITÉ !";
+            document.getElementById('resultTrophyIcon').innerText = "⚖️";
+            winner = "Égalité";
+          }
+          
+          this.saveScoreToLocal({ 
+            mode: 'duel', 
+            teamA: this.teamAName, scoreA: this.teamAScore,
+            teamB: this.teamBName, scoreB: this.teamBScore,
+            winner: winner, total: this.activeQuestions.length
+          });
+        }
+      }
+
+      // CLÉ NINJAGO POUR SAUVEGARDER LES SCORES SÉPARÉMENT
+      saveScoreToLocal(data) {
+        data.date = new Date().toISOString();
+        let scores = JSON.parse(localStorage.getItem('legoNinjagoQuizScores')) || [];
+        scores.push(data);
+        localStorage.setItem('legoNinjagoQuizScores', JSON.stringify(scores));
+      }
+      
+      showLeaderboard() {
+        this.showScreen('leaderboard');
+        this.renderLeaderboardList('solo');
+      }
+      
+      renderLeaderboardList(filterMode) {
+        const tabSolo = document.getElementById('tabSolo');
+        const tabDuel = document.getElementById('tabDuel');
+        if (filterMode === 'solo') {
+          tabSolo.className = "text-red-500 border-b-2 border-red-500 px-4 py-1 transition";
+          tabDuel.className = "text-gray-500 hover:text-gray-300 px-4 py-1 transition";
+        } else {
+          tabDuel.className = "text-red-500 border-b-2 border-red-500 px-4 py-1 transition";
+          tabSolo.className = "text-gray-500 hover:text-gray-300 px-4 py-1 transition";
+        }
+        
+        const listContainer = document.getElementById('leaderboardList');
+        listContainer.innerHTML = '';
+        
+        let scores = JSON.parse(localStorage.getItem('legoNinjagoQuizScores')) || [];
+        let filteredScores = scores.filter(s => s.mode === filterMode);
+        
+        if (filteredScores.length === 0) {
+          listContainer.innerHTML = `<div class="text-center py-10 text-gray-500 italic text-sm">Le palmarès du Dojo est vide. Participez au tournoi !</div>`;
+          return;
+        }
+        
+        if (filterMode === 'solo') {
+          filteredScores.sort((a, b) => {
+            const ratioA = a.score / a.total;
+            const ratioB = b.score / b.total;
+            if (ratioB !== ratioA) return ratioB - ratioA;
+            return new Date(b.date) - new Date(a.date);
+          });
+          
+          filteredScores.forEach((s, idx) => {
+            const date = new Date(s.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' }).replace(':', 'h');
+            const ratio = Math.round((s.score / s.total) * 100);
+            listContainer.innerHTML += `
+              <div class="flex items-center justify-between p-4 rounded-xl bg-black/60 border border-gray-700/80 hover:bg-gray-800/80 transition shadow-sm">
+                <div class="flex items-center gap-4">
+                  <div class="w-8 text-center font-bold font-ninja ${idx === 0 ? 'text-yellow-500 text-3xl' : (idx === 1 ? 'text-gray-300 text-2xl' : (idx === 2 ? 'text-yellow-700 text-2xl' : 'text-gray-500 text-xl'))}">
+                    #${idx + 1}
+                  </div>
+                  <div>
+                    <div class="font-ninja text-white tracking-wider text-xl uppercase">${s.name}</div>
+                    <div class="text-[11px] text-gray-400">${date} - <span class="italic text-gray-300 font-semibold">${s.rank}</span></div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-red-500 font-ninja text-3xl leading-none">${s.score} <span class="text-sm text-gray-500">/ ${s.total}</span></div>
+                  <div class="text-[10px] uppercase font-bold text-gray-500">${ratio}% de réussite</div>
+                </div>
+              </div>
+            `;
+          });
+        } else {
+          filteredScores.sort((a, b) => new Date(b.date) - new Date(a.date));
+          
+          filteredScores.forEach((s, idx) => {
+            const date = new Date(s.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' }).replace(':', 'h');
+            listContainer.innerHTML += `
+              <div class="p-4 rounded-xl bg-black/60 border border-gray-700/80 space-y-3 shadow-sm">
+                <div class="flex justify-between items-center text-xs text-gray-400">
+                  <span class="font-bold">Tournoi du ${date}</span>
+                  <span class="px-2 py-0.5 rounded bg-gray-800 border border-gray-600 font-semibold ${s.winner === 'Égalité' ? 'text-gray-300' : 'text-red-500'} uppercase font-ninja">Vainqueur : ${s.winner}</span>
+                </div>
+                <div class="flex items-stretch justify-between gap-3">
+                  <div class="flex-1 text-center bg-red-950/30 rounded-lg py-2 border-b-2 border-red-700 flex flex-col justify-center">
+                    <span class="block text-sm font-ninja uppercase text-red-500 truncate px-1" title="${s.teamA}">${s.teamA}</span>
+                    <span class="text-3xl font-ninja text-white leading-none mt-1">${s.scoreA} <span class="text-xs text-gray-500">/ ${s.total}</span></span>
+                  </div>
+                  <div class="flex items-center px-1 font-ninja text-gray-600 text-2xl italic">VS</div>
+                  <div class="flex-1 text-center bg-purple-950/30 rounded-lg py-2 border-b-2 border-purple-700 flex flex-col justify-center">
+                    <span class="block text-sm font-ninja uppercase text-purple-500 truncate px-1" title="${s.teamB}">${s.teamB}</span>
+                    <span class="text-3xl font-ninja text-white leading-none mt-1">${s.scoreB} <span class="text-xs text-gray-500">/ ${s.total}</span></span>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        }
+      }
+      
+      clearLeaderboard() {
+        if (confirm("Volonté de Maître Wu : Voulez-vous vraiment effacer les archives du Monastère ?")) {
+          localStorage.removeItem('legoNinjagoQuizScores');
+          this.renderLeaderboardList('solo');
+        }
+      }
+
+      openCustomModal() {
+        document.getElementById('customModal').classList.remove('hidden');
+      }
+
+      closeCustomModal() {
+        document.getElementById('customModal').classList.add('hidden');
+        document.getElementById('addQuestionForm').reset();
+      }
+
+      handleCustomQuestionSubmit(e) {
+        e.preventDefault();
+        const text = document.getElementById('custQText').value.trim();
+        const correct = document.getElementById('custQCorrect').value.trim();
+        const wrong1 = document.getElementById('custQWrong1').value.trim();
+        const wrong2 = document.getElementById('custQWrong2').value.trim();
+        const wrong3 = document.getElementById('custQWrong3').value.trim();
+        const expl = document.getElementById('custQExpl').value.trim() || "Un secret bien gardé du magasin !";
+
+        if (!text || !correct || !wrong1) return;
+
+        this.questionsPool.unshift({
+          question: text,
+          options: [correct, wrong1, wrong2 || "Un Fantôme", wrong3 || "Garmadon"],
+          correct: 0,
+          category: "Secret du Dojo",
+          explanation: expl
+        });
+
+        this.initUI();
+        this.closeCustomModal();
+        this.sound.playSwordClang();
+      }
+    }
+
+    const initApp = () => {
+      if (!window.app) {
+        window.app = new QuizApp();
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  </script>
+</body>
+</html>
